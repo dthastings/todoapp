@@ -1,0 +1,14 @@
+{
+  "manifest_version": 3,
+  "name": "Google Calendar Countdown",
+  "description": "Adds a native-style countdown (days until/since) to Google Calendar event details.",
+  "version": "1.0.0",
+  "content_scripts": [
+    {
+      "matches": ["https://calendar.google.com/*"],
+      "js": ["content.js"],
+      "css": ["content.css"],
+      "run_at": "document_idle"
+    }
+  ]
+}

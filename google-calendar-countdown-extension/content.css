@@ -1,0 +1,45 @@
+.gcd-countdown-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 8px 0 0;
+  padding: 8px 10px;
+  border-radius: 12px;
+  color: var(--gm3-sys-color-on-surface, inherit);
+  background: var(--gm3-sys-color-surface-container-high, rgba(60, 64, 67, 0.08));
+}
+
+.gcd-countdown-icon {
+  width: 20px;
+  height: 20px;
+  border-radius: 999px;
+  box-sizing: border-box;
+  border: 2px solid var(--gm3-sys-color-primary, #1a73e8);
+  position: relative;
+  flex-shrink: 0;
+}
+
+.gcd-countdown-icon::after {
+  content: "";
+  position: absolute;
+  width: 6px;
+  height: 2px;
+  border-radius: 2px;
+  background: var(--gm3-sys-color-primary, #1a73e8);
+  left: 50%;
+  top: 50%;
+  transform: translate(-5%, -50%) rotate(45deg);
+  transform-origin: left center;
+}
+
+.gcd-countdown-label {
+  font-size: 14px;
+  line-height: 20px;
+  font-weight: 500;
+  letter-spacing: 0.01em;
+  opacity: 0.92;
+}
+
+.gcd-countdown-value {
+  font-weight: 600;
+}
