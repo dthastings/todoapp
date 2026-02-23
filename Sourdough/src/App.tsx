@@ -7,7 +7,55 @@ import {
 } from './lib/calculations';
 import { dateToTodayMinutes, formatMinutesAsTime, formatTimeWithDay, minutesToDateToday } from './lib/time';
 
-type PlannerTab = 'timeline' | 'amount';
+type PlannerTab = 'timeline' | 'amount' | 'recipe';
+type RecipeStep = {
+  title: string;
+  summary: string;
+  offsetMinutes: number;
+};
+
+const RECIPE_STEPS: RecipeStep[] = [
+  {
+    title: 'Prepare levain',
+    summary: 'Mix levain ingredients and leave to mature for about 10 hours.',
+    offsetMinutes: 0
+  },
+  {
+    title: 'Autolyse with levain',
+    summary: 'Mix flour, water, and levain until combined and rest for 20 minutes.',
+    offsetMinutes: 10 * 60
+  },
+  {
+    title: 'Mix',
+    summary: 'Add salt and reserved water, then strengthen the dough briefly.',
+    offsetMinutes: 10 * 60 + 20
+  },
+  {
+    title: 'Bulk fermentation',
+    summary: 'Ferment for about 3.5 hours with two stretch-and-fold sets.',
+    offsetMinutes: 10 * 60 + 30
+  },
+  {
+    title: 'Divide and preshape',
+    summary: 'Divide dough into two pieces and rest for 30 minutes.',
+    offsetMinutes: 14 * 60
+  },
+  {
+    title: 'Shape',
+    summary: 'Shape loaves and place into proofing baskets.',
+    offsetMinutes: 14 * 60 + 30
+  },
+  {
+    title: 'Cold proof',
+    summary: 'Refrigerate overnight for the final proof.',
+    offsetMinutes: 14 * 60 + 30
+  },
+  {
+    title: 'Bake',
+    summary: 'Bake the next day (morning or after work), covered then uncovered.',
+    offsetMinutes: 24 * 60
+  }
+];
 
 function roundToQuarterHour(date: Date): number {
   const minutes = dateToTodayMinutes(date);
@@ -17,6 +65,10 @@ function roundToQuarterHour(date: Date): number {
 
 function formatGrams(value: number): string {
   return `${value.toFixed(1)}g`;
+}
+
+function addMinutes(date: Date, minutes: number): Date {
+  return new Date(date.getTime() + minutes * 60 * 1000);
 }
 
 function KittyBreadIllustration() {
@@ -66,8 +118,18 @@ function App() {
   const starterReadyAt = manualReadyAt ?? calculatedStarterReady;
   const bakeWindow = useMemo(() => computeBakeWindow(starterReadyAt, proofOption), [proofOption, starterReadyAt]);
   const buildBreakdown = useMemo(() => computeStarterBuild(desiredStarterG), [desiredStarterG]);
+  const timelineStartAt = manualReadyAt ?? feedTime;
+  const recipeTimeline = useMemo(
+    () =>
+      RECIPE_STEPS.map((step) => ({
+        ...step,
+        at: addMinutes(timelineStartAt, step.offsetMinutes)
+      })),
+    [timelineStartAt]
+  );
 
   const isUsingNow = manualReadyAt !== null;
+  const tabIndex = activeTab === 'timeline' ? 0 : activeTab === 'amount' ? 1 : 2;
 
   return (
     <main className="page-shell">
@@ -86,10 +148,7 @@ function App() {
         </section>
 
         <div className="tab-switch" role="tablist" aria-label="Calculator mode">
-          <span
-            className={activeTab === 'timeline' ? 'tab-glider tab-glider-left' : 'tab-glider tab-glider-right'}
-            aria-hidden="true"
-          />
+          <span className="tab-glider" aria-hidden="true" style={{ transform: `translateX(${tabIndex * 100}%)` }} />
           <button
             type="button"
             role="tab"
@@ -107,6 +166,15 @@ function App() {
             onClick={() => setActiveTab('amount')}
           >
             Sourdough Amount Calculator
+          </button>
+          <button
+            type="button"
+            role="tab"
+            aria-selected={activeTab === 'recipe'}
+            className={activeTab === 'recipe' ? 'tab-button active' : 'tab-button'}
+            onClick={() => setActiveTab('recipe')}
+          >
+            Timeline Mode
           </button>
         </div>
 
@@ -246,6 +314,29 @@ function App() {
                 <p className="timeline-time">{formatGrams(buildBreakdown.waterG)}</p>
               </div>
             </div>
+          </section>
+        ) : null}
+
+        {activeTab === 'recipe' ? (
+          <section className="recipe-mode-panel" aria-label="Recipe timeline mode">
+            <div className="result-block">
+              <p className="result-label">Timeline start</p>
+              <p className="result-time">{formatTimeWithDay(timelineStartAt)}</p>
+              <p className="result-note">Based on your selected starting time from the starter planner.</p>
+            </div>
+
+            <ol className="recipe-timeline">
+              {recipeTimeline.map((step) => (
+                <li key={step.title} className="recipe-step">
+                  <div className="recipe-step-dot" aria-hidden="true" />
+                  <div className="recipe-step-content">
+                    <p className="recipe-step-time">{formatTimeWithDay(step.at)}</p>
+                    <h3 className="recipe-step-title">{step.title}</h3>
+                    <p className="recipe-step-summary">{step.summary}</p>
+                  </div>
+                </li>
+              ))}
+            </ol>
           </section>
         ) : null}
       </section>

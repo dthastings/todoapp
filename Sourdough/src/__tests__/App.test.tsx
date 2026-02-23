@@ -92,4 +92,23 @@ describe('App', () => {
     expect(screen.getByText('14.0g')).toBeInTheDocument();
     expect(screen.getAllByText('28.0g')).toHaveLength(2);
   });
+
+  it('switches to timeline mode and shows recipe steps', () => {
+    render(<App />);
+    fireEvent.click(screen.getByRole('tab', { name: /timeline mode/i }));
+
+    expect(screen.getByText(/timeline start/i)).toBeInTheDocument();
+    expect(screen.getByText('Prepare levain')).toBeInTheDocument();
+    expect(screen.getByText('Bake')).toBeInTheDocument();
+  });
+
+  it('uses selected start time for timeline mode', () => {
+    render(<App />);
+    fireEvent.change(screen.getByLabelText(/feed your starter today/i), { target: { value: '60' } });
+    fireEvent.click(screen.getByRole('tab', { name: /timeline mode/i }));
+
+    const startDisplay = screen.getByText(/timeline start/i).nextElementSibling?.textContent;
+    const firstStepDisplay = document.querySelector('.recipe-step-time')?.textContent;
+    expect(firstStepDisplay).toEqual(startDisplay);
+  });
 });
