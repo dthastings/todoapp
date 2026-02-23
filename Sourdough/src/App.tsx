@@ -323,6 +323,16 @@ function App() {
               <p className="result-label">Timeline start</p>
               <p className="result-time">{formatTimeWithDay(timelineStartAt)}</p>
               <p className="result-note">Based on your selected starting time from the starter planner.</p>
+              <p className="recipe-link-wrap">
+                <a
+                  className="recipe-link"
+                  href="https://www.theperfectloaf.com/simple-weekday-sourdough-bread/"
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  View the Perfect Loaf recipe
+                </a>
+              </p>
             </div>
 
             <ol className="recipe-timeline">
