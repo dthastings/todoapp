@@ -8,7 +8,6 @@ import {
 import { dateToTodayMinutes, formatMinutesAsTime, formatTimeWithDay, minutesToDateToday } from './lib/time';
 
 type PlannerTab = 'timeline' | 'amount';
-type KittyIllustrationVariant = 'loaf' | 'baguette';
 
 function roundToQuarterHour(date: Date): number {
   const minutes = dateToTodayMinutes(date);
@@ -20,10 +19,7 @@ function formatGrams(value: number): string {
   return `${value.toFixed(1)}g`;
 }
 
-function KittyBreadIllustration({ variant }: { variant: KittyIllustrationVariant }) {
-  const loafColor = variant === 'loaf' ? '#f6c287' : '#ebaf67';
-  const breadShape = variant === 'loaf' ? 'M30 128 C45 110, 95 108, 114 128 L114 146 L30 146 Z' : 'M22 138 C38 116, 104 116, 122 138 C103 148, 42 149, 22 138 Z';
-
+function KittyBreadIllustration() {
   return (
     <svg viewBox="0 0 150 170" aria-hidden="true" className="kitty-svg">
       <ellipse cx="75" cy="76" rx="45" ry="39" fill="#fff" stroke="#2f1c2a" strokeWidth="2.5" />
@@ -41,10 +37,13 @@ function KittyBreadIllustration({ variant }: { variant: KittyIllustrationVariant
       <circle cx="118" cy="48" r="11" fill="#ff6fa7" />
       <circle cx="110" cy="52" r="6" fill="#ffd2e6" />
 
-      <path d={breadShape} fill={loafColor} stroke="#8b4d2c" strokeWidth="2.3" />
+      <path d="M28 128 C42 109, 95 108, 116 129 L116 146 L28 146 Z" fill="#f6c287" stroke="#8b4d2c" strokeWidth="2.3" />
       <line x1="52" y1="127" x2="59" y2="136" stroke="#8b4d2c" strokeWidth="2.3" />
       <line x1="70" y1="124" x2="77" y2="135" stroke="#8b4d2c" strokeWidth="2.3" />
       <line x1="88" y1="124" x2="95" y2="135" stroke="#8b4d2c" strokeWidth="2.3" />
+
+      <path d="M18 139 C34 121, 57 120, 72 138 C53 145, 33 146, 18 139 Z" fill="#ebaf67" stroke="#8b4d2c" strokeWidth="2.1" />
+      <path d="M78 139 C94 121, 117 120, 132 138 C113 145, 93 146, 78 139 Z" fill="#ebaf67" stroke="#8b4d2c" strokeWidth="2.1" />
     </svg>
   );
 }
@@ -79,14 +78,10 @@ function App() {
           <p className="lede">Plan starter timing or calculate a feeding build amount from one clean workspace.</p>
         </header>
 
-        <section className="kitty-illustration-row" aria-label="Hello Kitty themed bread illustrations">
+        <section className="kitty-illustration-row" aria-label="Hello Kitty themed bread illustration">
           <figure className="kitty-card">
-            <KittyBreadIllustration variant="loaf" />
-            <figcaption>Kitty loaf prep</figcaption>
-          </figure>
-          <figure className="kitty-card">
-            <KittyBreadIllustration variant="baguette" />
-            <figcaption>Kitty bakery mood</figcaption>
+            <KittyBreadIllustration />
+            <figcaption>Hello Kitty Bread Prep</figcaption>
           </figure>
         </section>
 

@@ -38,8 +38,7 @@
 
 .kitty-illustration-row {
   display: grid;
-  gap: var(--space-4);
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  justify-items: center;
 }
 
 .kitty-card {
@@ -47,7 +46,8 @@
   border: 1px solid var(--border);
   background: #fff;
   border-radius: var(--radius-md);
-  padding: 0.8rem;
+  padding: 0.9rem 1rem;
+  width: min(100%, 360px);
   display: grid;
   place-items: center;
   gap: 0.35rem;
@@ -64,7 +64,7 @@
 
 .kitty-svg {
   width: 100%;
-  max-width: 132px;
+  max-width: 188px;
   height: auto;
 }
 
@@ -277,11 +277,5 @@ input[type='number'] {
 
   .ingredient-grid .timeline-box:last-child {
     grid-column: auto;
-  }
-}
-
-@media (max-width: 520px) {
-  .kitty-illustration-row {
-    grid-template-columns: 1fr;
   }
 }
