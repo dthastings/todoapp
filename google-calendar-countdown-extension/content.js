@@ -2,7 +2,7 @@
   const DAY_MS = 24 * 60 * 60 * 1000;
   const ROW_CLASS = "gcd-countdown-row";
   const CONTEXT_SELECTOR = 'div[role="dialog"]';
-  const RECENT_CLICK_WINDOW_MS = 10000;
+  const RECENT_CLICK_WINDOW_MS = 3000;
 
   let lastClickedEvent = null;
 
@@ -137,7 +137,6 @@
     const candidates = [
       element.getAttribute("data-datekey"),
       element.getAttribute("data-date"),
-      element.getAttribute("data-day"),
       element.getAttribute("data-start-date"),
       element.getAttribute("datetime"),
       element.getAttribute("aria-label"),
@@ -206,8 +205,7 @@
   }
 
   function extractStartDate(container) {
-    const editLinks = Array.from(container.querySelectorAll('a[href*="eventedit"][href*="dates="]'))
-      .filter((link) => isVisible(link));
+    const editLinks = Array.from(container.querySelectorAll('a[href*="eventedit"][href*="dates="]'));
 
     for (const link of editLinks) {
       const fromHref = parseDateFromEditHref(link.getAttribute("href") || "");
@@ -225,18 +223,15 @@
       return dates[0];
     }
 
-    const contextualDate = extractDateFromAttributes(container);
-    if (contextualDate) {
-      return contextualDate;
-    }
-
-    const textDate = extractDateFromTextContent(container);
-    if (textDate) {
-      return textDate;
-    }
-
     if (lastClickedEvent && Date.now() - lastClickedEvent.timestamp < RECENT_CLICK_WINDOW_MS) {
-      return lastClickedEvent.date;
+      if (!lastClickedEvent.eventId) {
+        return lastClickedEvent.date;
+      }
+
+      const escapedEventId = window.CSS?.escape ? window.CSS.escape(lastClickedEvent.eventId) : lastClickedEvent.eventId;
+      if (container.querySelector(`[data-eventid="${escapedEventId}"]`)) {
+        return lastClickedEvent.date;
+      }
     }
 
     return null;
@@ -361,32 +356,30 @@
   }
 
   function captureEventClick(target) {
-    const eventNode = target.closest('[data-eventid], [role="button"], a[href*="eid="], a[href*="eventedit"]');
+    const eventNode = target.closest('[data-eventid], a[href*="eid="], a[href*="eventedit"]');
     if (!eventNode) {
       return;
     }
 
+    const eventId = eventNode.getAttribute("data-eventid") || null;
     const searchNodes = [
-      eventNode,
+      eventNode.closest("[role='gridcell']"),
       eventNode.closest("[data-datekey]"),
       eventNode.closest("[data-date]"),
-      eventNode.closest("[data-day]"),
-      eventNode.closest("[role='gridcell']"),
-      eventNode.parentElement
+      eventNode
     ].filter(Boolean);
 
     for (const node of searchNodes) {
       const date = extractDateFromAttributes(node);
       if (date) {
-        lastClickedEvent = { date, timestamp: Date.now() };
+        lastClickedEvent = { date, timestamp: Date.now(), eventId };
         return;
       }
+    }
 
-      const textDate = extractDateFromTextContent(node);
-      if (textDate) {
-        lastClickedEvent = { date: textDate, timestamp: Date.now() };
-        return;
-      }
+    const textDate = extractDateFromTextContent(eventNode);
+    if (textDate) {
+      lastClickedEvent = { date: textDate, timestamp: Date.now(), eventId };
     }
   }
 
