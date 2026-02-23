@@ -8,6 +8,7 @@ import {
 import { dateToTodayMinutes, formatMinutesAsTime, formatTimeWithDay, minutesToDateToday } from './lib/time';
 
 type PlannerTab = 'timeline' | 'amount';
+type KittyIllustrationVariant = 'loaf' | 'baguette';
 
 function roundToQuarterHour(date: Date): number {
   const minutes = dateToTodayMinutes(date);
@@ -17,6 +18,35 @@ function roundToQuarterHour(date: Date): number {
 
 function formatGrams(value: number): string {
   return `${value.toFixed(1)}g`;
+}
+
+function KittyBreadIllustration({ variant }: { variant: KittyIllustrationVariant }) {
+  const loafColor = variant === 'loaf' ? '#f6c287' : '#ebaf67';
+  const breadShape = variant === 'loaf' ? 'M30 128 C45 110, 95 108, 114 128 L114 146 L30 146 Z' : 'M22 138 C38 116, 104 116, 122 138 C103 148, 42 149, 22 138 Z';
+
+  return (
+    <svg viewBox="0 0 150 170" aria-hidden="true" className="kitty-svg">
+      <ellipse cx="75" cy="76" rx="45" ry="39" fill="#fff" stroke="#2f1c2a" strokeWidth="2.5" />
+      <circle cx="60" cy="74" r="4.2" fill="#2f1c2a" />
+      <circle cx="90" cy="74" r="4.2" fill="#2f1c2a" />
+      <ellipse cx="75" cy="84" rx="4.8" ry="3.3" fill="#f7c79c" />
+      <line x1="48" y1="80" x2="31" y2="77" stroke="#2f1c2a" strokeWidth="2" />
+      <line x1="49" y1="86" x2="30" y2="88" stroke="#2f1c2a" strokeWidth="2" />
+      <line x1="101" y1="80" x2="118" y2="77" stroke="#2f1c2a" strokeWidth="2" />
+      <line x1="101" y1="86" x2="120" y2="88" stroke="#2f1c2a" strokeWidth="2" />
+      <path d="M30 52 L44 38 L47 59 Z" fill="#fff" stroke="#2f1c2a" strokeWidth="2.5" />
+      <path d="M102 59 L106 38 L120 52 Z" fill="#fff" stroke="#2f1c2a" strokeWidth="2.5" />
+
+      <circle cx="102" cy="47" r="11" fill="#ff6fa7" />
+      <circle cx="118" cy="48" r="11" fill="#ff6fa7" />
+      <circle cx="110" cy="52" r="6" fill="#ffd2e6" />
+
+      <path d={breadShape} fill={loafColor} stroke="#8b4d2c" strokeWidth="2.3" />
+      <line x1="52" y1="127" x2="59" y2="136" stroke="#8b4d2c" strokeWidth="2.3" />
+      <line x1="70" y1="124" x2="77" y2="135" stroke="#8b4d2c" strokeWidth="2.3" />
+      <line x1="88" y1="124" x2="95" y2="135" stroke="#8b4d2c" strokeWidth="2.3" />
+    </svg>
+  );
 }
 
 function App() {
@@ -48,6 +78,17 @@ function App() {
           <h1>Starter + Bake Calculator</h1>
           <p className="lede">Plan starter timing or calculate a feeding build amount from one clean workspace.</p>
         </header>
+
+        <section className="kitty-illustration-row" aria-label="Hello Kitty themed bread illustrations">
+          <figure className="kitty-card">
+            <KittyBreadIllustration variant="loaf" />
+            <figcaption>Kitty loaf prep</figcaption>
+          </figure>
+          <figure className="kitty-card">
+            <KittyBreadIllustration variant="baguette" />
+            <figcaption>Kitty bakery mood</figcaption>
+          </figure>
+        </section>
 
         <div className="tab-switch" role="tablist" aria-label="Calculator mode">
           <span

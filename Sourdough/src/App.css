@@ -8,7 +8,7 @@
 .planner-card {
   width: min(100%, 760px);
   background: var(--surface);
-  border: 1px solid var(--border);
+  border: 2px solid var(--border);
   box-shadow: var(--shadow);
   border-radius: var(--radius-lg);
   padding: clamp(1.25rem, 2vw, 2rem);
@@ -36,6 +36,38 @@
   color: var(--text-secondary);
 }
 
+.kitty-illustration-row {
+  display: grid;
+  gap: var(--space-4);
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.kitty-card {
+  margin: 0;
+  border: 1px solid var(--border);
+  background: #fff;
+  border-radius: var(--radius-md);
+  padding: 0.8rem;
+  display: grid;
+  place-items: center;
+  gap: 0.35rem;
+  box-shadow: 0 8px 18px rgba(143, 37, 108, 0.12);
+}
+
+.kitty-card figcaption {
+  font-size: 0.84rem;
+  color: var(--text-secondary);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.kitty-svg {
+  width: 100%;
+  max-width: 132px;
+  height: auto;
+}
+
 .tab-switch {
   position: relative;
   display: grid;
@@ -43,7 +75,7 @@
   gap: 0;
   border: 1px solid var(--border);
   border-radius: 999px;
-  background: #efe4d4;
+  background: #ffd7ec;
   padding: 0.2rem;
   overflow: hidden;
 }
@@ -55,7 +87,7 @@
   width: calc(50% - 0.2rem);
   border-radius: 999px;
   background: #fff;
-  box-shadow: 0 6px 18px rgba(52, 37, 20, 0.15);
+  box-shadow: 0 6px 16px rgba(143, 37, 108, 0.2);
   transition: transform 180ms ease;
 }
 
@@ -159,6 +191,7 @@ input[type='number'] {
 
 .ghost-button:hover {
   border-color: var(--accent);
+  background: #ffe7f4;
 }
 
 .step-two {
@@ -190,7 +223,7 @@ input[type='number'] {
 
 .choice-button.active {
   border-color: var(--accent-strong);
-  background: #f4e9db;
+  background: #ffdced;
 }
 
 .proof-section {
@@ -244,5 +277,11 @@ input[type='number'] {
 
   .ingredient-grid .timeline-box:last-child {
     grid-column: auto;
+  }
+}
+
+@media (max-width: 520px) {
+  .kitty-illustration-row {
+    grid-template-columns: 1fr;
   }
 }
