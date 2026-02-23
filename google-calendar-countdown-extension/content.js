@@ -1,7 +1,7 @@
 (() => {
   const DAY_MS = 24 * 60 * 60 * 1000;
   const ROW_CLASS = "gcd-countdown-row";
-  const CONTEXT_SELECTOR = 'div[role="dialog"], div[role="main"]';
+  const CONTEXT_SELECTOR = 'div[role="dialog"]';
   const RECENT_CLICK_WINDOW_MS = 10000;
 
   let lastClickedEvent = null;
@@ -346,26 +346,7 @@
       if (!isVisible(context)) {
         return;
       }
-      contexts.add(context);
-    });
-
-    document.querySelectorAll('a[href*="eventedit"][href*="dates="]').forEach((link) => {
-      if (!isVisible(link)) {
-        return;
-      }
-
-      const context = link.closest(CONTEXT_SELECTOR);
-      if (context && isVisible(context)) {
-        contexts.add(context);
-      }
-    });
-
-    document.querySelectorAll("[data-eventid]").forEach((eventNode) => {
-      if (!isVisible(eventNode)) {
-        return;
-      }
-      const context = eventNode.closest(CONTEXT_SELECTOR);
-      if (context && isVisible(context)) {
+      if (context.querySelector('[data-eventid], a[href*="eid="], a[href*="eventedit"], time[datetime]')) {
         contexts.add(context);
       }
     });
