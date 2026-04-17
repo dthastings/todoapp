@@ -71,7 +71,7 @@
 .tab-switch {
   position: relative;
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 0;
   border: 1px solid var(--border);
   border-radius: 999px;
@@ -84,7 +84,7 @@
   position: absolute;
   top: 0.2rem;
   bottom: 0.2rem;
-  width: calc(33.333% - 0.2rem);
+  width: calc(25% - 0.2rem);
   border-radius: 999px;
   background: #fff;
   box-shadow: 0 6px 16px rgba(143, 37, 108, 0.2);
@@ -229,6 +229,11 @@ input[type='number'] {
   gap: var(--space-4);
 }
 
+.simple-time-panel {
+  display: grid;
+  gap: var(--space-4);
+}
+
 .recipe-mode-panel {
   display: grid;
   gap: var(--space-4);
@@ -346,5 +351,21 @@ input[type='number'] {
 
   .ingredient-grid .timeline-box:last-child {
     grid-column: auto;
+  }
+}
+
+@media (max-width: 640px) {
+  .tab-switch {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    border-radius: var(--radius-md);
+  }
+
+  .tab-glider {
+    display: none;
+  }
+
+  .tab-button {
+    border-radius: var(--radius-sm);
+    min-height: 3rem;
   }
 }

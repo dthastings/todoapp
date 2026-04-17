@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import {
   computeBakeWindow,
   computeStarterBuild,
@@ -7,7 +7,7 @@ import {
 } from './lib/calculations';
 import { dateToTodayMinutes, formatMinutesAsTime, formatTimeWithDay, minutesToDateToday } from './lib/time';
 
-type PlannerTab = 'timeline' | 'amount' | 'recipe';
+type PlannerTab = 'timeline' | 'amount' | 'recipe' | 'simple';
 type RecipeStep = {
   title: string;
   summary: string;
@@ -63,8 +63,29 @@ function roundToQuarterHour(date: Date): number {
   return Math.max(0, Math.min(1425, rounded));
 }
 
+function roundToHalfHour(date: Date): number {
+  const minutes = dateToTodayMinutes(date);
+  const rounded = Math.round(minutes / 30) * 30;
+  return Math.max(0, Math.min(1410, rounded));
+}
+
 function formatGrams(value: number): string {
   return `${value.toFixed(1)}g`;
+}
+
+function formatDuration(durationMinutes: number): string {
+  const hours = Math.floor(durationMinutes / 60);
+  const minutes = durationMinutes % 60;
+
+  if (hours === 0) {
+    return `${minutes} min`;
+  }
+
+  if (minutes === 0) {
+    return `${hours} hr`;
+  }
+
+  return `${hours} hr ${minutes} min`;
 }
 
 function addMinutes(date: Date, minutes: number): Date {
@@ -108,6 +129,9 @@ function App() {
   const [showBakeSection, setShowBakeSection] = useState<boolean>(false);
   const [proofOption, setProofOption] = useState<ProofOption>('none');
   const [desiredStarterG, setDesiredStarterG] = useState<number>(8);
+  const [recipeStartMinutes, setRecipeStartMinutes] = useState<number>(() => roundToHalfHour(new Date()));
+  const [simpleStartMinutes, setSimpleStartMinutes] = useState<number>(() => roundToHalfHour(new Date()));
+  const [breadPrepMinutes, setBreadPrepMinutes] = useState<number>(8 * 60);
 
   const feedTime = useMemo(() => minutesToDateToday(feedMinutesToday), [feedMinutesToday]);
   const calculatedStarterReady = useMemo(
@@ -118,7 +142,9 @@ function App() {
   const starterReadyAt = manualReadyAt ?? calculatedStarterReady;
   const bakeWindow = useMemo(() => computeBakeWindow(starterReadyAt, proofOption), [proofOption, starterReadyAt]);
   const buildBreakdown = useMemo(() => computeStarterBuild(desiredStarterG), [desiredStarterG]);
-  const timelineStartAt = starterReadyAt;
+  const timelineStartAt = useMemo(() => minutesToDateToday(recipeStartMinutes), [recipeStartMinutes]);
+  const simpleStartAt = useMemo(() => minutesToDateToday(simpleStartMinutes), [simpleStartMinutes]);
+  const simpleReadyAt = useMemo(() => addMinutes(simpleStartAt, breadPrepMinutes), [breadPrepMinutes, simpleStartAt]);
   const recipeTimeline = useMemo(
     () =>
       RECIPE_STEPS.map((step) => ({
@@ -129,7 +155,12 @@ function App() {
   );
 
   const isUsingNow = manualReadyAt !== null;
-  const tabIndex = activeTab === 'timeline' ? 0 : activeTab === 'amount' ? 1 : 2;
+  const tabIndex =
+    activeTab === 'timeline' ? 0 : activeTab === 'amount' ? 1 : activeTab === 'recipe' ? 2 : 3;
+
+  useEffect(() => {
+    setRecipeStartMinutes(roundToHalfHour(starterReadyAt));
+  }, [starterReadyAt]);
 
   return (
     <main className="page-shell">
@@ -175,6 +206,15 @@ function App() {
             onClick={() => setActiveTab('recipe')}
           >
             Timeline Mode
+          </button>
+          <button
+            type="button"
+            role="tab"
+            aria-selected={activeTab === 'simple'}
+            className={activeTab === 'simple' ? 'tab-button active' : 'tab-button'}
+            onClick={() => setActiveTab('simple')}
+          >
+            Simple Time Calculator
           </button>
         </div>
 
@@ -319,10 +359,29 @@ function App() {
 
         {activeTab === 'recipe' ? (
           <section className="recipe-mode-panel" aria-label="Recipe timeline mode">
+            <div className="controls-grid">
+              <div className="control-group">
+                <label htmlFor="recipe-start">When do you want to start the recipe?</label>
+                <input
+                  id="recipe-start"
+                  type="range"
+                  min={0}
+                  max={1410}
+                  step={30}
+                  value={recipeStartMinutes}
+                  onChange={(event) => {
+                    setRecipeStartMinutes(Number(event.target.value));
+                  }}
+                  aria-describedby="recipe-start-value"
+                />
+                <p id="recipe-start-value" className="value-readout">{formatMinutesAsTime(recipeStartMinutes)}</p>
+              </div>
+            </div>
+
             <div className="result-block">
               <p className="result-label">Timeline start</p>
               <p className="result-time">{formatTimeWithDay(timelineStartAt)}</p>
-              <p className="result-note">Based on your selected starting time from the starter planner.</p>
+              <p className="result-note">Defaults to your starter-ripe time, but you can adjust it here.</p>
               <p className="recipe-link-wrap">
                 <a
                   className="recipe-link"
@@ -347,6 +406,54 @@ function App() {
                 </li>
               ))}
             </ol>
+          </section>
+        ) : null}
+
+        {activeTab === 'simple' ? (
+          <section className="simple-time-panel" aria-label="Simple time calculator">
+            <div className="controls-grid">
+              <div className="control-group">
+                <label htmlFor="simple-start">What time do you want to start?</label>
+                <input
+                  id="simple-start"
+                  type="range"
+                  min={0}
+                  max={1410}
+                  step={30}
+                  value={simpleStartMinutes}
+                  onChange={(event) => {
+                    setSimpleStartMinutes(Number(event.target.value));
+                  }}
+                  aria-describedby="simple-start-value"
+                />
+                <p id="simple-start-value" className="value-readout">{formatMinutesAsTime(simpleStartMinutes)}</p>
+              </div>
+
+              <div className="control-group">
+                <label htmlFor="bread-prep-time">Bread prep time</label>
+                <input
+                  id="bread-prep-time"
+                  type="range"
+                  min={30}
+                  max={24 * 60}
+                  step={30}
+                  value={breadPrepMinutes}
+                  onChange={(event) => {
+                    setBreadPrepMinutes(Number(event.target.value));
+                  }}
+                  aria-describedby="bread-prep-time-value"
+                />
+                <p id="bread-prep-time-value" className="value-readout">{formatDuration(breadPrepMinutes)}</p>
+              </div>
+            </div>
+
+            <div className="result-block" role="status" aria-live="polite">
+              <p className="result-label">Bread ready to bake</p>
+              <p className="result-time">{formatTimeWithDay(simpleReadyAt)}</p>
+              <p className="result-note">
+                Starting at {formatTimeWithDay(simpleStartAt)} with {formatDuration(breadPrepMinutes)} of bread prep.
+              </p>
+            </div>
           </section>
         ) : null}
       </section>

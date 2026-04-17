@@ -113,4 +113,29 @@ describe('App', () => {
     expect(startDisplay).toEqual(ripeDisplay);
     expect(firstStepDisplay).toEqual(startDisplay);
   });
+
+  it('allows the recipe timeline start to be adjusted independently', () => {
+    render(<App />);
+    fireEvent.change(screen.getByLabelText(/feed your starter today/i), { target: { value: '60' } });
+    fireEvent.click(screen.getByRole('tab', { name: /timeline mode/i }));
+
+    const defaultStart = screen.getByText(/timeline start/i).nextElementSibling?.textContent;
+    fireEvent.change(screen.getByLabelText(/when do you want to start the recipe/i), { target: { value: '600' } });
+    const adjustedStart = screen.getByText(/timeline start/i).nextElementSibling?.textContent;
+
+    expect(adjustedStart).not.toEqual(defaultStart);
+    expect(document.querySelector('.recipe-step-time')?.textContent).toEqual(adjustedStart);
+  });
+
+  it('shows a ready-to-bake time in simple time calculator', () => {
+    render(<App />);
+    fireEvent.click(screen.getByRole('tab', { name: /simple time calculator/i }));
+
+    fireEvent.change(screen.getByLabelText(/what time do you want to start/i), { target: { value: '480' } });
+    fireEvent.change(screen.getByLabelText(/bread prep time/i), { target: { value: '150' } });
+
+    expect(screen.getByText(/bread ready to bake/i)).toBeInTheDocument();
+    expect(screen.getByText(/starting at/i)).toBeInTheDocument();
+    expect(screen.getAllByText(/2 hr 30 min/i)).toHaveLength(2);
+  });
 });
