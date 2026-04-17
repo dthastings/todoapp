@@ -118,7 +118,7 @@ function App() {
   const starterReadyAt = manualReadyAt ?? calculatedStarterReady;
   const bakeWindow = useMemo(() => computeBakeWindow(starterReadyAt, proofOption), [proofOption, starterReadyAt]);
   const buildBreakdown = useMemo(() => computeStarterBuild(desiredStarterG), [desiredStarterG]);
-  const timelineStartAt = manualReadyAt ?? feedTime;
+  const timelineStartAt = starterReadyAt;
   const recipeTimeline = useMemo(
     () =>
       RECIPE_STEPS.map((step) => ({

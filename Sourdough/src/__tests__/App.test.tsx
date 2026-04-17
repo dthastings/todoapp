@@ -105,10 +105,12 @@ describe('App', () => {
   it('uses selected start time for timeline mode', () => {
     render(<App />);
     fireEvent.change(screen.getByLabelText(/feed your starter today/i), { target: { value: '60' } });
+    const ripeDisplay = screen.getByText(/Starter ripe at/i).nextElementSibling?.textContent;
     fireEvent.click(screen.getByRole('tab', { name: /timeline mode/i }));
 
     const startDisplay = screen.getByText(/timeline start/i).nextElementSibling?.textContent;
     const firstStepDisplay = document.querySelector('.recipe-step-time')?.textContent;
+    expect(startDisplay).toEqual(ripeDisplay);
     expect(firstStepDisplay).toEqual(startDisplay);
   });
 });
